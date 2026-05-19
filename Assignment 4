@@ -1,0 +1,126 @@
+# ============================================================
+#   Traffic Accident Data Analysis System
+#   Name   : Advaith Muralidharan
+#   Reg No : 2117250020013
+#   Dept   : CSE  |  Section : A
+# ============================================================
+
+# Import Libraries
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+
+# ── 1. Create Sample Traffic Accident Dataset ────────────────
+accident_data = {
+    'Record_ID': [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
+    'Station_Name': [
+        'Chennai', 'Chennai', 'Chennai', 'Chennai',
+        'Delhi',   'Delhi',   'Delhi',   'Delhi',
+        'Mumbai',  'Mumbai',  'Mumbai',  'Mumbai'
+    ],
+    'Location': [
+        'South', 'South', 'South', 'South',
+        'North', 'North', 'North', 'North',
+        'West',  'West',  'West',  'West'
+    ],
+    'Month': [
+        'Jan', 'Apr', 'Jul', 'Oct',
+        'Jan', 'Apr', 'Jul', 'Oct',
+        'Jan', 'Apr', 'Jul', 'Oct'
+    ],
+    'Accident_Count': [
+         85, 110, 140, 120,
+        200, 245, 310, 270,
+        130, 160, 200, 180
+    ],
+    'Severity_Index': [
+        4.2, 5.1, 6.3, 5.8,
+        7.0, 7.8, 8.5, 8.0,
+        5.0, 5.9, 6.8, 6.2
+    ],
+    'Fatalities': [
+        12, 18, 25, 20,
+        35, 42, 60, 50,
+        18, 24, 33, 28
+    ],
+    'Injuries': [
+         70,  90, 112,  98,
+        160, 200, 248, 218,
+        105, 132, 165, 150
+    ],
+    'Speed_Violation': [
+        30, 40,  55,  48,
+        80, 95, 120, 105,
+        45, 58,  75,  65
+    ]
+}
+
+# ── 2. Create DataFrame ──────────────────────────────────────
+df = pd.DataFrame(accident_data)
+
+# ── 3. Display Dataset ───────────────────────────────────────
+print("\n========== Traffic Accident Dataset ==========\n")
+print(df.to_string(index=False))
+
+# ── 4. Check Missing Values ──────────────────────────────────
+print("\n========== Missing Values ==========\n")
+print(df.isnull().sum())
+
+# ── 5. Basic Statistics ──────────────────────────────────────
+print("\n========== Basic Accident Statistics ==========\n")
+print(df[['Accident_Count', 'Severity_Index', 'Fatalities']].describe())
+
+# ── 6. NumPy Statistics ──────────────────────────────────────
+acc_array = np.array(df['Accident_Count'])
+print("\n========== NumPy Accident_Count Statistics ==========\n")
+print(f"Mean Accidents    : {np.mean(acc_array):.2f}")
+print(f"Maximum Accidents : {np.max(acc_array)}")
+print(f"Minimum Accidents : {np.min(acc_array)}")
+print(f"Std Deviation     : {np.std(acc_array):.2f}")
+
+# ── 7. Monthly Average Accident Count ────────────────────────
+monthly_acc = df.groupby('Month')['Accident_Count'].mean()
+print("\n========== Monthly Average Accident Count ==========\n")
+print(monthly_acc)
+
+# ── 8. Maximum Accidents by Station ─────────────────────────
+max_acc = df.groupby('Station_Name')['Accident_Count'].max()
+print("\n========== Maximum Accidents by Station ==========\n")
+print(max_acc)
+
+# ── 9. Pivot Table ───────────────────────────────────────────
+pivot = pd.pivot_table(
+    df,
+    values='Accident_Count',
+    index='Station_Name',
+    columns='Month',
+    aggfunc=np.mean
+)
+print("\n========== Pivot Table - Accident Count Analysis ==========\n")
+print(pivot)
+
+# ── 10. Visualization 1 – Average Accident Count by Month ────
+plt.figure(figsize=(7, 4))
+monthly_acc.plot(kind='bar', color='orange')
+plt.title('Average Accident Count by Month')
+plt.xlabel('Month')
+plt.ylabel('Accident Count')
+plt.grid(axis='y')
+plt.tight_layout()
+plt.show()
+
+# ── 11. Visualization 2 – Accident Trend by Station ──────────
+plt.figure(figsize=(8, 4))
+for station in df['Station_Name'].unique():
+    subset = df[df['Station_Name'] == station]
+    plt.plot(subset['Month'], subset['Accident_Count'],
+             marker='o', label=station)
+plt.title('Accident Trend by Station')
+plt.xlabel('Month')
+plt.ylabel('Accident Count')
+plt.legend()
+plt.grid(True)
+plt.tight_layout()
+plt.show()
+
+print("\n Traffic Accident Analysis Completed Successfully")
